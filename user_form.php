@@ -20,6 +20,14 @@
 <input type="file" name="image"><br />
 <input type="submit" value="Upload">
 </form>
-<?php print_r($_POST);
+<?php //print_r($_POST);
+$image = "unknown-person.jpg";
+if(!empty($_FILES['image']['name'])) { 
+    $image = $_FILES['image']['name'];
+    
+    $form->upload($_FILES);}
+if(isset($_POST)){ 
+   // $form->insert_user($_POST['name'], $_POST['surname'], $_POST['gender'], $_POST['address'], $image);
+    print_r($form->checkIfUserExists($_POST['name'], $_POST['surname']));
 
-$form->upload($_FILES);
+}
