@@ -16,7 +16,7 @@ class db_con
         $this->host = 'localhost';
         $this->user = 'root';
         $this->pass = '';
-        $this->db = 'video_store';
+        $this->db = 'card';
         
         $this->mysqli = new \mysqli($this->host, $this->user, $this->pass, $this->db);
         $this->mysqli->set_charset('utf8');

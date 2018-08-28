@@ -10,34 +10,69 @@ class userFunctions {
         return $input;
     }
     
-    function form_errors($userName, $password){
-        if (strlen($userName) > 10 || strlen($userName) < 3) {
+    function form_errors($name, $surname, $address, $company, $position, $email, $phone){
+        if (strlen($name) > 10 || strlen($name) < 3) {
             array_push($this->errors, "Name should be between 3 and 10 characters.");
             return false;
         }
         
-        if (strlen($password) > 10 || strlen($password) < 3) {
+        if (strlen($surname) > 10 || strlen($surname) < 3) {
             array_push($this->errors, "Surname should be between 3 and 10 characters.");
             return false;
         }
         
+        if (strlen($address) > 20 || strlen($address) < 3) {
+            array_push($this->errors, "Address should be between 3 and 20 characters.");
+            return false;
+        }
+        
+        if (strlen($email) > 30 || strlen($email) < 3) {
+            array_push($this->errors, "E-mail should be between 3 and 30 characters.");
+            return false;
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            array_push($this->errors, "Invalid E-mail format.");
+            return false;
+        }
+        if (strlen($company) > 30 || strlen($company) < 3) {
+            array_push($this->errors, "Company name should be between 3 and 30 characters.");
+            return false;
+        }
+        
+        if (strlen($position) > 25 || strlen($position) < 3) {
+            array_push($this->errors, "Company position should be between 3 and 25 characters.");
+            return false;
+        }
+
+        
+        if (strlen($phone) > 15 || strlen($phone) < 3) {
+            array_push($this->errors, "Phone number should be between 3 and 15 characters.");
+            return false;
+        }
         return true;
     }
     
-    function upload($image) {
-        print_r($image);
+    function filepath($name){
         $currentDir = getcwd();
         $uploadDirectory = "\\pictures\\";
-        $fileExtensions = ['jpeg','jpg','png']; // Get all the file extensions
+        $fileName = $name;
+        $uploadPath = $currentDir . $uploadDirectory . basename($fileName);
+        return $uploadPath;
+        
+    }
+    function upload($image) {
+   
+        $currentDir = getcwd();
+        $uploadDirectory = "\\pictures\\";
+        $fileExtensions = ['jpeg','jpg','png'];
         $fileName = $image['image']['name'];
         $fileSize = $image['image']['size'];
         $fileTmpName  = $image['image']['tmp_name'];
-     //   $fileType = $image['image']['type'];
+
         $tmp = explode('.',$fileName);
         $fileExtension = strtolower(end($tmp));
         $uploadPath = $currentDir . $uploadDirectory . basename($fileName);
-        echo $uploadPath;
-        
+                
             if (! in_array($fileExtension,$fileExtensions)) {
                 $this->errors[] = "This file extension is not allowed. Please upload a JPEG or PNG file";
             }
@@ -59,15 +94,15 @@ class userFunctions {
             }
     }
     
-    function insert_user($userName, $userSurname, $gender, $address, $picture) {
-        if ($this->form_errors($userName, $userSurname)) {
+    function insert_user($userName, $userSurname, $address, $picture, $company, $position, $email, $phone) {
+        if ($this->form_errors($userName, $userSurname, $address, $company, $position, $email, $phone)) {
           
            
-               $query = "INSERT INTO `user`(`name`, `surname`, `gender`, `address`, `picture`) VALUES (?,?,?,?,?)";
+               $query = "INSERT INTO `user`(`name`, `surname`, `address`, `picture`, `company`, `position`, `email`, `phone`) VALUES (?,?,?,?,?,?,?,?)";
               
                $con = new DB_con\db_con();
                $conn = $con->mysqli->prepare($query);
-               $conn->bind_param('ssiss', $userName, $userSurname, $gender, $address, $picture);
+               $conn->bind_param('ssssssss', $userName, $userSurname, $address, $picture , $company, $position, $email, $phone);
                $conn->execute();               
                 $conn->close();
               
@@ -75,25 +110,5 @@ class userFunctions {
         }
         
     }
-    
-    function checkIfUserExists($userName, $userSurname) {
-        if ($this->form_errors($userName, $userSurname)) {
-            
-            
-            $query = "SELECT `name` , `surname` FROM `user` WHERE `name` = ? AND `surname` = ?";
-            
-            $con = new DB_con\db_con();
-            $conn = $con->mysqli->prepare($query);
-            $conn->bind_param('ss', $userName, $userSurname);
-            $conn->execute();
-            if($conn->get_result()->num_rows == 0) {array_push($this->errors, "Invalid username or password"); return true;}
-            else {
-                return false;
-            }
-            
-            $conn->close();
-            
-        }
         
-    }
 }
